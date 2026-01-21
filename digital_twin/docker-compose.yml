@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Main API server
+  api:
+    build: .
+    container_name: digital_twin_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./config:/app/config
+      - ./.env:/app/.env
+    environment:
+      - INFERENCE_ENGINE=${INFERENCE_ENGINE:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - CHROMA_PERSIST_DIR=/app/data/chroma
+    depends_on:
+      - chroma
+      - ollama
+    restart: unless-stopped
+    networks:
+      - digital_twin_net
+
+  # ChromaDB for vector storage
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: digital_twin_chroma
+    ports:
+      - "8002:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+    restart: unless-stopped
+    networks:
+      - digital_twin_net
+
+  # Ollama for local inference (optional)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: digital_twin_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - digital_twin_net
+    # Note: You'll need to pull the model manually:
+    # docker exec -it digital_twin_ollama ollama pull llama3.1:8b
+
+volumes:
+  chroma_data:
+  ollama_data:
+
+networks:
+  digital_twin_net:
+    driver: bridge
