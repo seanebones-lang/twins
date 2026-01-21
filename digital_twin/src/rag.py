@@ -8,8 +8,13 @@ from typing import List, Dict, Any, Optional
 import yaml
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema import Document
+try:
+    from langchain_core.prompts import ChatPromptTemplate
+    from langchain_core.documents import Document
+except ImportError:
+    # Fallback for older versions
+    from langchain.prompts import ChatPromptTemplate
+    from langchain.schema import Document
 from datasets import load_dataset
 import json
 from dotenv import load_dotenv
