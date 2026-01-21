@@ -33,13 +33,13 @@ python3 -c "import nltk; nltk.download('punkt', quiet=True)"
 echo "Creating directories..."
 mkdir -p data/raw data/processed data/chroma models outputs
 
-# Copy .env.example if .env doesn't exist
+# Copy env.example if .env doesn't exist
 if [ ! -f ".env" ]; then
-    if [ -f ".env.example" ]; then
-        cp .env.example .env
-        echo "Created .env from .env.example - please configure it"
+    if [ -f "env.example" ]; then
+        cp env.example .env
+        echo "Created .env from env.example - please configure it"
     else
-        echo "⚠️ .env.example not found - create .env manually"
+        echo "⚠️ env.example not found - create .env manually"
     fi
 else
     echo "✅ .env already exists"
